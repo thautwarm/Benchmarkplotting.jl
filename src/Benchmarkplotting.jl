@@ -10,8 +10,8 @@ using Statistics
 export bcompare, report
 
 function bcompare(criterion :: Function,
-                  data :: Vector{Pair{Symbol, Any}},
-                  implementations :: Vector{Pair{Symbol, Function}})
+                  data :: Vector{Pair{Symbol, T}},
+                  implementations :: Vector{Pair{Symbol, Function}}) where T
     rows = []
     for (impl_name, impl) in implementations
         for (case_name, case) in data

@@ -45,4 +45,4 @@ criterion(benchmark_result) = (time = mean(benchmark_result.times), )
 df = bcompare(criterion, cases, implementations)
 res = report(:time, df)
 @info res[2]
-draw(SVG("example.svg", 9inch, 7inch), res[1])
+draw(SVG("example.svg", 9inch, 6inch), res[1])
