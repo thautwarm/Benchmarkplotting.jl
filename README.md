@@ -1,3 +1,9 @@
+The style follows the official [Julia Micro-Benchmarks](https://julialang.org/benchmarks/).
+
+[![Example figure](./example.svg)](./example.svg)
+
+
+```julia
 using Benchmarkplotting
 using Gadfly
 using Statistics
@@ -46,3 +52,5 @@ df = bcompare(criterion, cases, implementations)
 res = report(:time, df)
 @info res[2]
 draw(SVG("example.svg", 9inch, 7inch), res[1])
+
+```

@@ -3,6 +3,7 @@ module Benchmarkplotting
 using BenchmarkTools
 using Gadfly
 using DataFrames
+using Printf
 using StatsBase
 using Statistics
 
@@ -29,6 +30,7 @@ function report(field :: Symbol,
                 result :: DataFrame,
                 first :: Union{Symbol, Nothing} = nothing,
                 layouts...)
+    result = copy(result)
     impls = []
     means = []
     priorities = []
@@ -41,17 +43,29 @@ function report(field :: Symbol,
         end
 
     case_names  = collect(Set(result.case))
+    case_names_with_unit = Dict()
     for case_name in case_names
-        data = result[result[:case] .== case_name, :]
-        gmean = geomean(data[field])
+        idx = result[:case] .== case_name
+        tmp = result[idx, field]
+        minval = minimum(tmp)
+        tmp = tmp ./ minval
+        result[idx, field] = tmp
+        gmean = geomean(tmp)
         push!(means, gmean)
+        minval_repr = @sprintf "%.3f" minval
+        case_names_with_unit[case_name] = Symbol(case_name, "(min: $minval_repr)")
         push_priority(case_name)
     end
 
     casemean = DataFrame(case=case_names, geomean=means, priority=priorities)
     benchmarks = join(result, casemean, on=:case)
+
+    benchmarks[:, :case] = map(x -> case_names_with_unit[x], benchmarks[:, :case])
+    casemean[:, :case] = map(x -> case_names_with_unit[x], casemean[:, :case])
+
     sort!(benchmarks, [:priority, :geomean])
     sort!(casemean, [:priority, :geomean])
+
     ymax = maximum(benchmarks[field])
     plot(benchmarks,
         x = :case,
@@ -60,7 +74,7 @@ function report(field :: Symbol,
         layouts...,
         Guide.ylabel(nothing),
         Guide.xlabel(nothing),
-        Coord.Cartesian(ymin=0, ymax=ymax),
+        Coord.Cartesian(ymin=0.5, ymax=ymax),
         Theme(
             guide_title_position = :left,
             colorkey_swatch_shape = :circle,
