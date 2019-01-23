@@ -1,0 +1,11 @@
+name = "Benchmarkplotting"
+uuid = "621fc970-1f17-11e9-1dd6-171653f578e7"
+authors = ["thautwarm <twshere@outlook.com>"]
+version = "0.1.0"
+
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Gadfly = "c91e804a-d5a3-530f-b6f0-dfbca275c004"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
