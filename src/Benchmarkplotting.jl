@@ -15,8 +15,11 @@ function bcompare(criterion :: Function,
     rows = []
     for (impl_name, impl) in implementations
         for (case_name, case) in data
-            action = :($impl($case))
-            res = criterion(@benchmark $action)
+            @inline function action()
+                impl(case)
+            end
+            @info action()
+            res = criterion(@benchmark $action())
             row = (implementation = impl_name,
                    case = case_name,
                    res...)
