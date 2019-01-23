@@ -74,7 +74,7 @@ function report(field :: Symbol,
         layouts...,
         Guide.ylabel(nothing),
         Guide.xlabel(nothing),
-        Coord.Cartesian(ymin=0.5, ymax=ymax),
+        Coord.Cartesian(ymin=0.9, ymax=ymax),
         Theme(
             guide_title_position = :left,
             colorkey_swatch_shape = :circle,
