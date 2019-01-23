@@ -11,14 +11,17 @@ export bcompare, report
 
 function bcompare(criterion :: Function,
                   data :: Vector{Pair{Symbol, T}},
-                  implementations :: Vector{Pair{Symbol, Function}}) where T
+                  implementations :: Vector{Pair{Symbol, Function}}, quiet :: Bool = false) where T
     rows = []
     for (impl_name, impl) in implementations
         for (case_name, case) in data
+            # avoid the evaluation of case(if it's of AST types)
             @inline function action()
                 impl(case)
             end
-            @info action()
+            if !quiet
+                @info impl_name case_name action()
+            end
             res = criterion(@benchmark $action())
             row = (implementation = impl_name,
                    case = case_name,
@@ -31,8 +34,8 @@ end
 
 function report(field :: Symbol,
                 result :: DataFrame,
-                first :: Union{Symbol, Nothing} = nothing,
-                layouts...)
+                layouts...
+                ; first :: Union{Symbol, Nothing} = nothing)
     result = copy(result)
     impls = []
     means = []
@@ -68,8 +71,6 @@ function report(field :: Symbol,
 
     sort!(benchmarks, [:priority, :geomean])
     sort!(casemean, [:priority, :geomean])
-
-    ymax = maximum(benchmarks[field])
     plot(benchmarks,
         x = :case,
         y = field,
@@ -77,7 +78,6 @@ function report(field :: Symbol,
         layouts...,
         Guide.ylabel(nothing),
         Guide.xlabel(nothing),
-        Coord.Cartesian(ymin=0.9, ymax=ymax),
         Theme(
             guide_title_position = :left,
             colorkey_swatch_shape = :circle,
