@@ -75,7 +75,6 @@ function report(field :: Symbol,
         x = :case,
         y = field,
         color=:implementation,
-        layouts...,
         Guide.ylabel(nothing),
         Guide.xlabel(nothing),
         Theme(
@@ -84,6 +83,7 @@ function report(field :: Symbol,
             minor_label_font = "Consolas",
             major_label_font = "Consolas"
          ),
+         layouts...,
     ), casemean[:, 1:2]
 
 end
