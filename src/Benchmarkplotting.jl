@@ -9,9 +9,13 @@ using Statistics
 
 export bcompare, report
 
+get_names(::NamedTuple{Names, T}) where {Names, T} = Names
+
 function bcompare(criterion :: Function,
                   data :: Vector{Pair{Symbol, T}},
-                  implementations :: Vector{Pair{Symbol, Function}}, quiet :: Bool = false) where T
+                  implementations :: Vector{Pair{Symbol, Function}};
+                  repeat :: Int = 3,
+                  quiet :: Bool = false) where T
     rows = []
     for (impl_name, impl) in implementations
         for (case_name, case) in data
@@ -22,7 +26,13 @@ function bcompare(criterion :: Function,
             if !quiet
                 @info impl_name case_name action()
             end
-            res = criterion(@benchmark $action())
+            fst_test = criterion(@benchmark $action())
+            fields = get_names(fst_test)
+            repeats = [criterion(@benchmark $action) for _ in 1:repeat]
+            res = Dict([field => fst_test[field] for field in fields])
+            for field in fields
+                res[field] = (res[field] + sum([it[field] for it in repeats])) ./ (1 + repeat)
+            end
             row = (implementation = impl_name,
                    case = case_name,
                    res...)

@@ -42,7 +42,7 @@ implementations = [
 
 criterion(benchmark_result) = (time = mean(benchmark_result.times), )
 
-df = bcompare(criterion, cases, implementations, true)
+df = bcompare(criterion, cases, implementations, quiet=true)
 res = report(:time, df, Scale.y_log10)
 @info res[2]
 draw(SVG("example.svg", 9inch, 6inch), res[1])
