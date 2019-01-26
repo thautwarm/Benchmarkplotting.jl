@@ -14,7 +14,7 @@ get_names(::NamedTuple{Names, T}) where {Names, T} = Names
 function bcompare(criterion :: Function,
                   data :: Vector{Pair{Symbol, T}},
                   implementations :: Vector{Pair{Symbol, Function}};
-                  repeat :: Int = 3,
+                  repeat :: Int = 2,
                   quiet :: Bool = false) where T
     rows = []
     for (impl_name, impl) in implementations
