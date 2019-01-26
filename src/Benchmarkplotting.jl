@@ -44,21 +44,12 @@ end
 
 function report(field :: Symbol,
                 result :: DataFrame,
-                layouts...
-                ; first :: Union{Symbol, Nothing} = nothing)
+                layouts...)
     result = copy(result)
     impls = []
     means = []
-    priorities = []
-    push_priority = first === nothing ?
-        function (_)
-            push!(priorities, 2)
-        end :
-        function (x)
-            push!(priorities, x === first ? 1 : 2)
-        end
 
-    case_names  = collect(Set(result.case))
+    case_names  = unique(result.case)
     case_names_with_unit = Dict()
     for case_name in case_names
         idx = result[:case] .== case_name
@@ -70,17 +61,14 @@ function report(field :: Symbol,
         push!(means, gmean)
         minval_repr = @sprintf "%.3f" minval
         case_names_with_unit[case_name] = Symbol(case_name, "(min: $minval_repr)")
-        push_priority(case_name)
     end
 
-    casemean = DataFrame(case=case_names, geomean=means, priority=priorities)
+    casemean = DataFrame(case=case_names, geomean=means)
     benchmarks = join(result, casemean, on=:case)
 
     benchmarks[:, :case] = map(x -> case_names_with_unit[x], benchmarks[:, :case])
     casemean[:, :case] = map(x -> case_names_with_unit[x], casemean[:, :case])
 
-    sort!(benchmarks, [:priority, :geomean])
-    sort!(casemean, [:priority, :geomean])
     plot(benchmarks,
         x = :case,
         y = field,
